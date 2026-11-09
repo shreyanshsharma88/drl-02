@@ -1,0 +1,9 @@
+# Runtime dependencies (training, experiments, plots, notebook execution & export)
+gymnasium[classic-control]>=0.28
+numpy>=1.23
+matplotlib>=3.6
+pandas>=1.5
+ipykernel>=6.0
+nbformat>=5.7
+nbclient>=0.7
+nbconvert>=7.0
