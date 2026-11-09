@@ -17,6 +17,15 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 ```
 
+On Windows, create the environment with `python -m venv .venv` and activate it with
+`.venv\Scripts\Activate.ps1` before installing the requirements.
+
+PDF export uses ReportLab and Beautiful Soup, included in the requirements, with
+fonts bundled by Matplotlib. It needs no Chrome/Chromium, LaTeX, browser downloads,
+or system HTML-rendering libraries. Install the Python requirements in the lab
+environment before running the commands below. The PDF uses a paginated report
+layout rather than reproducing the HTML stylesheet exactly.
+
 ## Run
 ```bash
 python make_pdf.py              # build notebook -> execute (~5 min) -> HTML -> PDF

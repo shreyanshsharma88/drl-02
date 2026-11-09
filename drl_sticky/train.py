@@ -105,7 +105,7 @@ def train_agent(
         log["shaped_return"][ep] = shaped
         log["length"][ep] = steps
         log["success"][ep] = float(term)
-        log["gentle"][ep] = float(term and obs2[1] <= cfg.gentle_speed)
+        log["gentle"][ep] = float(gentle_now)
         if term:
             log["arrival_velocity"][ep] = float(obs2[1])
         log["pushes"][ep] = pushes
