@@ -44,6 +44,13 @@ Over five seeds (84-88), the modified-environment reward is -139.3 ± 12.7 for Q
 ## Layout
 `drl_sticky/` package · `tests/` · `docs/` (traceability, design, user guide, results, testing) · `results/` (results.json, per-episode CSV logs, Q-tables) · `figures/` · `screenshots/` (virtual-lab captures).
 
+## Your remaining steps
+1. In the virtual lab, unzip the source zip, install the requirements and run the notebook. The step-by-step guide is in `docs/user_guide.md`.
+2. Take timestamped screenshots into `screenshots/` and create `VLAB_RUN.txt`.
+3. Run `python make_pdf.py --no-execute` and check that section (f) shows the screenshots and the TODO is gone.
+4. Check the names and registration numbers on page 1.
+5. Submit the first version by 12 Nov; the final deadline is 14 Nov.
+
 ## **BEFORE SUBMISSION**
 - [ ] **RUN THE NOTEBOOK IN THE BITS VIRTUAL LAB (SEE docs/user_guide.md, "VIRTUAL-LAB DEMO SCRIPT")**
 - [ ] **TAKE TIMESTAMPED VIRTUAL-LAB SCREENSHOTS AND SAVE THEM IN screenshots/**

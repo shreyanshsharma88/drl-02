@@ -359,6 +359,7 @@ print(f"evaluation finished in {time.time()-t0:.1f}s")
     C.append(code(HELPER1, hide_input=True))
     C.append(md("### d.1 Episode reward versus training episode"))
     C.append(code("""
+# Plotting helpers, then Fig. d.1: episode reward (raw + 100-episode moving average) per environment
 from drl_sticky.plotting import (plot_metric_panels, plot_value_overlay, plot_rates, plot_policy_maps,
                                  plot_arrival_speed, plot_seed_robustness, plot_bins_ablation)
 from drl_sticky.discretizer import UniformDiscretizer
@@ -368,24 +369,28 @@ Image("figures/fig1_reward.png", width=900)
     C.append(dyn(INTERP["fig1"]))
     C.append(md("### d.2 Average predicted value  mean over validation states of max_a Q(s,a)"))
     C.append(code("""
+# Fig. d.2: average max_a Q(s,a) over the fixed validation set, and the Q-learning - SARSA gap
 plot_value_overlay(LOGS, "figures/fig2_value.png")
 Image("figures/fig2_value.png", width=900)
 """))
     C.append(dyn(INTERP["fig2"]))
     C.append(md("### d.3 Success rate and gentle-arrival rate (moving average over the previous 100 episodes)"))
     C.append(code("""
+# Fig. d.3: success and gentle-arrival rates, moving average over the previous 100 episodes
 plot_rates(LOGS, "figures/fig3_rates.png")
 Image("figures/fig3_rates.png", width=900)
 """))
     C.append(dyn(INTERP["fig3"]))
     C.append(md("### d.4 Average number of push actions (0 or 2) selected per episode"))
     C.append(code("""
+# Fig. d.4: number of push actions (0 or 2) selected per episode
 plot_metric_panels(LOGS, "pushes", "Push actions (0 or 2) selected", "Push actions selected per episode", "figures/fig4_pushes.png")
 Image("figures/fig4_pushes.png", width=900)
 """))
     C.append(dyn(INTERP["fig4"]))
     C.append(md("### d.5 Greedy policy maps (position x velocity)"))
     C.append(code("""
+# Fig. d.5: greedy action per (position, velocity) cell for the four agents + action shares
 DISC = UniformDiscretizer((CFG.n_pos_bins, CFG.n_vel_bins))
 plot_policy_maps(EV["_maps"], DISC, "figures/fig5_policy_maps.png")
 display(Image("figures/fig5_policy_maps.png", width=820))
@@ -407,6 +412,7 @@ tab.round(3)
     C.append(dyn(INTERP["table"]))
     C.append(md("### d.7 Additional evidence: arrival speed, robustness across seeds, and transfer to the sticky environment"))
     C.append(code("""
+# Arrival-velocity histograms (last 1000 training episodes) for both environments
 plot_arrival_speed(R["evaluation"], LOGS, "figures/fig6_arrival_speed.png")
 Image("figures/fig6_arrival_speed.png", width=900)
 """))
@@ -430,6 +436,7 @@ ms = pd.DataFrame({names[k]: {f"{m} (mean +- std)": f"{v[m]['mean']:.3f} +- {v[m
 ms
 """))
     C.append(code("""
+# Per-seed greedy results and the discretization ablation
 plot_seed_robustness(ROB["summary"], "figures/fig7_seeds.png")
 plot_bins_ablation(ROB["bins_ablation"]["results"], "figures/fig8_bins_ablation.png")
 display(Image("figures/fig7_seeds.png", width=900))
@@ -470,9 +477,11 @@ print(f"results/results.json written; notebook run time {R['meta']['total_second
 The pilot ran **before** the main study and used **different seeds** (master seeds 184, 284, 384 and evaluation seeds 50000+) from the final experiments (seed 84, evaluation seeds 10000+), so the reported test results were never used for tuning. It covered every combination of bins {20x20, 36x28, 40x40}, alpha {0.05, 0.1, 0.2}, epsilon-floor fraction {0.5, 0.7} and episodes {6000, 10000}, for both algorithms on the modified environment and 3 seeds each: 216 training runs. Below are the script and its top-10 configurations, ranked by mean greedy test reward.
 """))
     C.append(code("""
+# Print the full source of the hyper-parameter pilot script
 print(open("pilot_sweep.py").read())
 """))
     C.append(code("""
+# Top-10 pilot configurations ranked by mean greedy test reward (modified env, 3 pilot seeds x 2 algorithms)
 pil = json.load(open("results/pilot.json"))
 pd.DataFrame(pil["ranking"][:10]).round(3)
 """))
@@ -481,6 +490,7 @@ pd.DataFrame(pil["ranking"][:10]).round(3)
 The same experiments can be run without Jupyter. This script calls exactly the functions used above.
 """))
     C.append(code("""
+# Print the full source of the command-line entry point
 print(open("run_experiments.py").read())
 """))
     C.append(md("""

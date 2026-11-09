@@ -65,3 +65,18 @@ def test_contribution_declaration_lists_all_members():
     for name in ["SHREYANSH SHARMA", "LAKSHYA KANCHAN", "VINAY PRATAP SINGH BHADAURIA"]:
         assert name in text
     assert text.count("100%") >= 3
+
+
+def test_every_visible_notebook_code_cell_commented():
+    """Notebook cells shown in the PDF carry a comment; functions defined there have docstrings."""
+    import build_notebook
+    for cell in build_notebook.cells():
+        if cell.cell_type != "code" or "remove_input" in cell.metadata.get("tags", []):
+            continue
+        src = cell.source
+        if src.startswith("%%writefile"):
+            continue                                   # module files are covered by the docstring test
+        assert any(l.strip().startswith("#") for l in src.splitlines()), src[:80]
+        for node in ast.walk(ast.parse(src)):
+            if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                assert ast.get_docstring(node), node.name
