@@ -84,16 +84,16 @@ All three members contributed equally to the design, implementation, experiments
 | (d) | Performance evaluation: 5 plot families, policy maps, greedy test table | 3 |
 | (e) | Discussion: 5 questions answered with our measurements | 2 |
 | (f) | Virtual-lab execution screenshots (with timestamps) | n/a |
-| App. A-C | Hyper-parameter pilot, CLI script, training log covering every iteration | n/a |
+| App. A-C | Hyper-parameter pilot, CLI script, complete per-episode training logs (every iteration) | n/a |
 
-**What we built.** The whole solution is written by hand in NumPy as a small package, `drl_sticky`. It contains the wrapper, discretizer, agents, training loop, evaluation and plots. Every module is reproduced in full below through `%%writefile` cells. Running this notebook top to bottom writes the package, runs every experiment and regenerates every number and figure in this PDF. Gymnasium supplies only the MountainCar-v0 physics. No RL library is used.
+We wrote the whole solution by hand in NumPy as a small package, `drl_sticky`, which holds the wrapper, discretizer, agents, training loop, evaluation and plots. Each module appears in full below as a `%%writefile` cell, so running the notebook from top to bottom writes the package, runs every experiment and regenerates every number and figure in this PDF. Gymnasium provides only the MountainCar-v0 physics, and we use no RL library.
 
-**Reproducibility.** We use one master seed, **84** (our group number). Separate RNG streams are derived from it for (i) environment resets, (ii) the sticky actuator and (iii) the agent's exploration. Because the streams are separate, the actuator noise never shifts the agent's exploration draws. The four required agents share exactly the same `Config` object.
+For reproducibility we use one master seed, 84 (our group number), and derive separate RNG streams from it for environment resets, the sticky actuator and the agent's exploration. Because the streams are separate, actuator noise never shifts the agent's exploration draws. All four agents share the same `Config` object.
 """))
     # ------------------------------------------------------------------ setup
     C.append(md("""
 ## 0. Setup and execution environment
-The cell below records **when and where** this copy of the notebook was executed (time stamp, host name, library versions). The notebook was also executed in the **BITS virtual lab** (host `ip-10-3-17-70.ap-south-1.compute.internal`, 13-14 Nov 2026). Section (f) shows the timestamped screenshots of that run. All randomness is seeded, so both runs produce identical numbers. Screenshot 5 shows the lab's greedy-evaluation table, which matches table d.6 below digit for digit.
+The cell below records when and where this copy of the notebook ran (time stamp, host name, library versions). We also ran the notebook in the BITS virtual lab (host `ip-10-3-17-70.ap-south-1.compute.internal`, 13-14 Nov 2026), and section (f) has the timestamped screenshots of that run. All randomness is seeded, so both runs give identical numbers; screenshot 5 shows the lab's greedy-evaluation table, which matches table d.6 below digit for digit.
 """))
     C.append(code("""
 # Create the package folder (the %%writefile cells below fill it)
@@ -147,16 +147,16 @@ for k, v in R["meta"].items():
     C.append(md("""
 ## (a) Modified Environment Implementation and Verification
 ### a.1 Implementation
-`StickyActuatorMountainCar` (in `drl_sticky/env.py`, listed below) subclasses **`gym.Wrapper`** and performs Steps 1-6 **in the prescribed order**:
+`StickyActuatorMountainCar` (in `drl_sticky/env.py`, listed below) subclasses `gym.Wrapper` and performs Steps 1-6 in the order the assignment gives:
 
-1. **Receive** the selected action `a` and keep it for the reward.
-2. **Sticky actuator.** If `a == a_prev` the action runs unchanged, and *no random number is drawn*. Otherwise draw `r ~ U[0,1)`. If `r < 0.20` the action is replaced by `a_prev`, otherwise `a` is kept. Then set `a_prev = a_exec`.
-3. **Execute** `a_exec` in the original MountainCar-v0 and receive `obs, R_base, terminated, truncated, info`.
-4. **Modified reward:** `R = R_base - 0.2 * 1[a != 1] + B`, using the **selected** action `a`.
-5. **Gentle-arrival bonus:** `B = +20` iff `terminated and not truncated and obs[0] >= 0.5 and obs[1] <= 0.04`.
-6. **Return** `obs, R, terminated, truncated, info`. The `info` dict is the base environment's own dict, untouched.
+1. Receive the selected action `a` and keep it for the reward.
+2. Apply the sticky actuator. If `a == a_prev` the action runs unchanged and no random number is drawn. Otherwise draw `r ~ U[0,1)`; if `r < 0.20` the action is replaced by `a_prev`, otherwise `a` is kept. Then set `a_prev = a_exec`.
+3. Execute `a_exec` in the original MountainCar-v0 and receive `obs, R_base, terminated, truncated, info`.
+4. Compute the modified reward `R = R_base - 0.2 * 1[a != 1] + B` from the selected action `a`.
+5. Pay the gentle-arrival bonus `B = +20` iff `terminated and not truncated and obs[0] >= 0.5 and obs[1] <= 0.04`.
+6. Return `obs, R, terminated, truncated, info`, where `info` is the base environment's own dict, untouched.
 
-`reset()` sets `a_prev = 1`. The sticky RNG belongs to the wrapper. The attributes starting with `last_` exist only for the audit below. They never appear in the observation or in `info`, so the agent gets no hint that an action was replaced.
+`reset()` sets `a_prev = 1`, and the sticky RNG belongs to the wrapper. The attributes starting with `last_` exist only for the audit below. They never appear in the observation or in `info`, so the agent cannot tell that an action was replaced.
 """))
     C.append(writefile("env.py"))
     C.append(md("The verification experiments are in `drl_sticky/verify.py`:"))
@@ -174,14 +174,14 @@ spec = R["verification"]["spec"]
 pd.DataFrame({"check": list(spec.keys()), "result": [str(v) for v in spec.values()]})
 """))
     C.append(dyn("""
-Same seed and same action sequence, with stick probability set to 0, give **bit-identical observations and identical terminated/truncated flags** to the base environment. So the dynamics, termination (flag at 0.5) and truncation (200 steps) are untouched. The observation and action spaces are equal to the originals. `info` has exactly the base keys `{spec['info_keys_sticky_env']}`, and `a_prev` is `{spec['a_prev_after_reset']}` right after `reset()`.
+With the stick probability set to 0, the same seed and action sequence give bit-identical observations and identical terminated/truncated flags to the base environment, so the dynamics, termination (flag at 0.5) and truncation (200 steps) are unchanged. The observation and action spaces equal the originals. `info` has exactly the base keys `{spec['info_keys_sticky_env']}`, and `a_prev` is `{spec['a_prev_after_reset']}` right after `reset()`.
 """))
     C.append(md("### a.3 The assignment's worked example (scripted random numbers 0.55, 0.11, 0.74, 0.05)"))
     C.append(code("""
 # Replay the 5-step example table of the assignment with a scripted RNG
 pd.DataFrame(R["verification"]["pdf_example"]).set_index("step")
 """))
-    C.append(md("The executed actions are **2, 2, 2, 0, 0**, exactly as in the assignment's table. At step 2 no number is drawn because the agent repeats the executed action. At step 5 the change 0 to 1 is blocked because 0.05 < 0.20."))
+    C.append(md("The executed actions are 2, 2, 2, 0, 0, the same as in the assignment's table. No number is drawn at step 2 because the agent repeats the executed action, and at step 5 the change from 0 to 1 is blocked because 0.05 < 0.20."))
     C.append(md("### a.4 About 20% of attempted changes are replaced, and none when the action is repeated"))
     C.append(code("""
 # Random-policy audit: counts over every step of 2000 episodes
@@ -201,7 +201,7 @@ print("First 25 audited steps (r = '-' means no draw because a == a_prev):")
 pd.DataFrame(aud["step_log"]).fillna("-")
 """))
     C.append(dyn("""
-Out of **{aud['attempted_changes']:,}** attempted changes, **{aud['replaced']:,}** were replaced, a rate of **{100*aud['replacement_rate']:.2f}%**. The 95% CI [{100*aud['ci95'][0]:.2f}%, {100*aud['ci95'][1]:.2f}%] contains 20%. Out of **{aud['repeat_steps']:,}** steps where the agent repeated the executed action, **{aud['replaced_on_repeat']}** were modified.
+Of {aud['attempted_changes']:,} attempted changes, {aud['replaced']:,} were replaced, a rate of {100*aud['replacement_rate']:.2f}% with a 95% CI of [{100*aud['ci95'][0]:.2f}%, {100*aud['ci95'][1]:.2f}%] that contains 20%. Of the {aud['repeat_steps']:,} steps where the agent repeated the executed action, {aud['replaced_on_repeat']} were modified.
 """))
     C.append(md("### a.5 The energy penalty follows the *selected* action"))
     C.append(code("""
@@ -214,7 +214,7 @@ print("penalised steps with selected a = 1     :", aud["penalty_on_selected_1"])
 print("unpenalised steps with selected a = 0/2 :", aud["penalty_missing_on_push"])
 """))
     C.append(md("""
-The penalty is read back from the returned reward as `R_base + B - R`. Every row has *penalty correct* = *steps*. The off-diagonal rows matter most: **a=0, a_exec=2** and **a=2, a_exec=1** are stuck pushes that are still charged 0.2, and **a=1, a_exec=0/2** means the actuator kept pushing while the agent chose to coast, and it is **not** charged. As the specification requires, the penalty depends only on the selected action.
+We recover the penalty from the returned reward as `R_base + B - R`, and in every row *penalty correct* equals *steps*. The off-diagonal rows are the informative ones. In a=0, a_exec=2 and a=2, a_exec=1 the push was stuck and is still charged 0.2. In a=1, a_exec=0/2 the actuator kept pushing after the agent chose to coast, and no penalty is charged. The penalty therefore depends only on the selected action, as the specification requires.
 """))
     C.append(md("### a.6 The +20 bonus is paid only for a gentle arrival"))
     C.append(code("""
@@ -231,22 +231,22 @@ display(pd.DataFrame(rows, columns=["policy", "outcome | bonus", "episodes", "me
 print("episodes where bonus != 20*[gentle arrival]:", bon["violations"])
 pd.DataFrame(bon["examples"])
 """))
-    C.append(md("Every gentle arrival (terminated, not truncated, position >= 0.5, velocity <= 0.04) received **B = 20**. Every fast arrival and every truncation received **B = 0**. There are no violations."))
+    C.append(md("Every gentle arrival (terminated, not truncated, position >= 0.5, velocity <= 0.04) received B = 20, and every fast arrival and every truncation received B = 0, with no violations."))
     # ------------------------------------------------------------------ (b)
     C.append(md("""
 ## (b) Q-Learning
 ### b.1 State discretization
-`UniformDiscretizer` maps (position, velocity) to bin indices, with `idx = clip(floor((x - low)/width), 0, n-1)` applied in each dimension. The **Q-table** has shape *(position bins x velocity bins x 3)* and starts at zero.
+`UniformDiscretizer` maps (position, velocity) to bin indices, with `idx = clip(floor((x - low)/width), 0, n-1)` applied in each dimension. The Q-table has shape *(position bins x velocity bins x 3)* and starts at zero.
 
 ### b.2 Agent and update rule
-`TabularTDAgent` holds the Q-table, the epsilon-greedy policy (ties among equal maxima are broken at random, which matters with a zero-initialised table) and the generic update `Q(s,a) <- Q(s,a) + alpha * (target - Q(s,a))`. **`QLearningAgent`** overrides only the target:
+`TabularTDAgent` holds the Q-table, the epsilon-greedy policy (ties among equal maxima are broken at random, which matters with a zero-initialised table) and the generic update `Q(s,a) <- Q(s,a) + alpha * (target - Q(s,a))`. `QLearningAgent` overrides only the target:
 
-`target = R + gamma * max_a' Q(s', a')`, or just `R` when the episode is **terminated** (reaching the flag is a true terminal state). On **truncation** at 200 steps the agent still bootstraps, because a time-out is not a terminal state of the task.
+`target = R + gamma * max_a' Q(s', a')`, or just `R` when the episode is terminated (reaching the flag is a true terminal state). On truncation at 200 steps the agent still bootstraps, because a time-out is not a terminal state of the task.
 
-Here `a` is the **selected** action. The executed action is hidden from the agent.
+Here `a` is the selected action; the agent never sees the executed one.
 
 ### b.3 Training loop
-The same loop trains both algorithms. The next action `a'` is chosen epsilon-greedily *before* the update and is then actually executed. Q-learning ignores `a'` in its target, and SARSA uses it. As a result **the TD target is the only difference** between the two experiments. The loop logs every episode: return, length, success, gentle arrival, arrival velocity, selected pushes, epsilon, the average predicted value on the validation set, and (for the audit only) the number of sticky replacements.
+One loop trains both algorithms. The next action `a'` is chosen epsilon-greedily before the update and is then executed. Q-learning ignores `a'` in its target and SARSA uses it, so the two experiments differ only in the TD target. The loop logs every episode: return, length, success, gentle arrival, arrival velocity, selected pushes, epsilon, the average predicted value on the validation set, and (for the audit only) the number of sticky replacements.
 """))
     C.append(writefile("discretizer.py"))
     C.append(writefile("agents.py"))
@@ -290,7 +290,7 @@ for env in ["original", "modified"]:
     # ------------------------------------------------------------------ (c)
     C.append(md("""
 ## (c) SARSA
-SARSA uses **the same** discretization, zero Q-table, alpha, gamma, epsilon schedule, random seeds and number of episodes, because it receives the same `CFG` object. The class definitions below are printed from `drl_sticky/agents.py`. `SarsaAgent` overrides **only** `td_target`, which bootstraps from `Q(s', a')` where `a'` is the next action the epsilon-greedy policy actually chose:
+SARSA receives the same `CFG` object, so it uses the same discretization, zero Q-table, alpha, gamma, epsilon schedule, random seeds and number of episodes. The class definitions below are printed from `drl_sticky/agents.py`. `SarsaAgent` overrides only `td_target`, which bootstraps from `Q(s', a')` where `a'` is the next action the epsilon-greedy policy actually chose:
 
 `Q(s,a) <- Q(s,a) + alpha * [R + gamma * Q(s',a') - Q(s,a)]`, with no bootstrap when terminated.
 """))
@@ -314,9 +314,9 @@ AGENTS = {k: AGENTS[k] for k in LOGS}
     # ------------------------------------------------------------------ (d)
     C.append(md("""
 ## (d) Performance Evaluation
-The four agents are **Q-learning / SARSA x original / modified environment**. In every figure, **colour = algorithm** (blue = Q-learning, orange = SARSA) and **panel = environment**. Thin faint lines show individual episodes and thick lines show the 100-episode trailing moving average.
+The four agents are Q-learning and SARSA, each trained on the original and the modified environment. In every figure the colour shows the algorithm (blue = Q-learning, orange = SARSA) and each panel is one environment. Thin faint lines are individual episodes and thick lines are the 100-episode trailing moving average.
 
-*Note on reward scales.* The original environment pays -1 per step. The modified environment pays -1.2 per step when a push is selected, plus 20 for a gentle arrival. Rewards are therefore compared **between algorithms within an environment**. Across environments we compare success, gentle-arrival rate, episode length and push counts, which share the same units.
+*Note on reward scales.* The original environment pays -1 per step. The modified environment pays -1.2 per step when a push is selected, plus 20 for a gentle arrival. We therefore compare rewards between algorithms within one environment. Across environments we compare success, gentle-arrival rate, episode length and push counts, which have the same units in both.
 """))
     C.append(md("Evaluation, plotting and experiment-orchestration code (used from here on):"))
     C.append(writefile("evaluate.py"))
@@ -366,7 +366,7 @@ plot_metric_panels(LOGS, "return", "Episode reward", "Episode reward vs training
 Image("figures/fig1_reward.png", width=900)
 """))
     C.append(dyn(INTERP["fig1"]))
-    C.append(md("### d.2 Average predicted value  mean over validation states of max_a Q(s,a)"))
+    C.append(md("### d.2 Average predicted value: mean over validation states of max_a Q(s,a)"))
     C.append(code("""
 # Fig. d.2: average max_a Q(s,a) over the fixed validation set, and the Q-learning - SARSA gap
 plot_value_overlay(LOGS, "figures/fig2_value.png")
@@ -470,7 +470,7 @@ print(f"results/results.json written; notebook run time {R['meta']['total_second
     # ------------------------------------------------------------------ (f)
     C.append(md("""
 ## (f) Virtual-lab execution (screenshots with timestamps)
-The notebook was executed in the **BITS virtual lab** by group member VINAY PRATAP SINGH BHADAURIA (lab user `s2025ag05689`). The lab clock (top-right of each screenshot) shows the date and time of every capture.
+The notebook was executed in the BITS virtual lab by group member VINAY PRATAP SINGH BHADAURIA (lab user `s2025ag05689`). The lab clock (top-right of each screenshot) shows the date and time of every capture.
 
 | Item | Value seen in the screenshots |
 |---|---|
@@ -484,7 +484,7 @@ The notebook was executed in the **BITS virtual lab** by group member VINAY PRAT
     # ------------------------------------------------------------------ appendices
     C.append(md("""
 ## Appendix A: Hyper-parameter pilot (`pilot_sweep.py`)
-The pilot ran **before** the main study and used **different seeds** (master seeds 184, 284, 384 and evaluation seeds 50000+) from the final experiments (seed 84, evaluation seeds 10000+), so the reported test results were never used for tuning. It covered every combination of bins {20x20, 36x28, 40x40}, alpha {0.05, 0.1, 0.2}, epsilon-floor fraction {0.5, 0.7} and episodes {6000, 10000}, for both algorithms on the modified environment and 3 seeds each: 216 training runs. Below are the script and its top-10 configurations, ranked by mean greedy test reward.
+The pilot ran before the main study and used different seeds (master seeds 184, 284, 384 and evaluation seeds 50000+) from the final experiments (seed 84, evaluation seeds 10000+), so the reported test results were never used for tuning. It covered every combination of bins {20x20, 36x28, 40x40}, alpha {0.05, 0.1, 0.2}, epsilon-floor fraction {0.5, 0.7} and episodes {6000, 10000}, for both algorithms on the modified environment and 3 seeds each: 216 training runs. Below are the script and its top-10 configurations, ranked by mean greedy test reward.
 """))
     C.append(code("""
 # Print the full source of the hyper-parameter pilot script
@@ -504,8 +504,8 @@ The same experiments can be run without Jupyter. This script calls exactly the f
 print(open("run_experiments.py").read())
 """))
     C.append(md("""
-## Appendix C: Training log covering every iteration (all 10,000 episodes of each agent)
-Each row summarises one block of 100 consecutive training episodes, so every one of the 4 x 10,000 episodes is counted. **eps** = exploration rate at the end of the block. For each agent: **R** = mean episode reward, **succ** = % of episodes that reached the flag, **gentle** = % with a gentle arrival (v <= 0.04). The progress lines printed during training in (b) and (c) are the raw per-episode output; the full per-episode data (reward, length, pushes, avg max Q, sticky replacements) is saved in `results/logs/*.csv`.
+## Appendix C: Complete per-episode training logs (every iteration)
+One line per training episode for each of the four agents. **ep** = episode, **eps** = epsilon, **R** = episode reward, **len** = steps, **S** = reached flag, **G** = gentle arrival, **P** = push actions selected, **V** = average max_a Q on the validation set, **x** = sticky replacements (modified environment only). The same data is saved as CSV in `results/logs/`.
 """))
     C.append(code(LOG_CELL, hide_input=True))
     return C
@@ -535,23 +535,25 @@ for i, s in enumerate(shots, 1):
 '''
 
 LOG_CELL = '''
-# One compact table: every training episode of every agent, aggregated in blocks of 100 episodes
-BLOCK = 100
-names = {"qlearning_original": "Q-learning orig", "sarsa_original": "SARSA orig",
-         "qlearning_modified": "Q-learning mod", "sarsa_modified": "SARSA mod"}
-first = next(iter(LOGS.values()))
-n = len(first["return"])
-cols = {("", "episodes"): [f"{i+1}-{min(i+BLOCK, n)}" for i in range(0, n, BLOCK)],
-        ("", "eps"): [f"{first['epsilon'][min(i+BLOCK, n)-1]:.3f}" for i in range(0, n, BLOCK)]}
-for run, label in names.items():
+# Dense multi-column listing of every training episode of every agent
+def dense_log(run, cols=3):
+    """Format the per-episode log of `run` as fixed-width text, `cols` episodes per line."""
     lg = LOGS[run]
-    blocks = range(0, len(lg["return"]), BLOCK)
-    cols[(label, "R")] = [np.mean(lg["return"][i:i+BLOCK]) for i in blocks]           # mean reward of the block
-    cols[(label, "succ")] = [100 * np.mean(lg["success"][i:i+BLOCK]) for i in blocks]  # % reached the flag
-    cols[(label, "gentle")] = [100 * np.mean(lg["gentle"][i:i+BLOCK]) for i in blocks] # % gentle arrivals
-table = pd.DataFrame(cols)
-table.columns = pd.MultiIndex.from_tuples(table.columns)
-display(HTML("<div class='dense-log'>" + table.to_html(index=False, float_format=lambda v: f"{v:.1f}") + "</div>"))
+    mod = run.endswith("modified")
+    def fmt(i):
+        """One episode as a fixed-width record."""
+        s = (f"{int(lg['episode'][i])+1:5d} {lg['epsilon'][i]:.3f} {lg['return'][i]:7.1f} {int(lg['length'][i]):3d} "
+             f"{int(lg['success'][i])}{int(lg['gentle'][i])} {int(lg['pushes'][i]):3d} {lg['avg_max_q'][i]:7.2f}")
+        return s + (f" {int(lg['replaced'][i]):2d}" if mod else "")
+    head = "   ep   eps       R len SG   P       V" + ("  x" if mod else "")
+    n = len(lg["return"]); per = (n + cols - 1) // cols
+    lines = [" | ".join([head] * cols)]
+    for r in range(per):
+        lines.append(" | ".join(fmt(c * per + r) for c in range(cols) if c * per + r < n))
+    return "\\n".join(lines)
+for run in LOGS:
+    display(HTML(f"<h3>{run} ({len(LOGS[run]['return'])} episodes)</h3><div class='dense-log'><pre>"
+                 + dense_log(run) + "</pre></div>"))
 '''
 
 HELPER1 = '''

@@ -22,7 +22,7 @@
     }
   },
   "meta": {
-    "timestamp": "2026-11-14T01:55:59",
+    "timestamp": "2026-11-14T02:09:30",
     "hostname": "Shreyanshs-MacBook-Air.local",
     "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
     "python": "3.14.7",
@@ -30,7 +30,7 @@
     "numpy": "2.5.4",
     "pandas": "3.1.1",
     "cpu_count": 10,
-    "total_seconds": 277.8812108039856
+    "total_seconds": 252.7832272052765
   },
   "verification": {
     "spec": {
@@ -530,7 +530,7 @@
       "first_success_episode": 1089,
       "first100_pushes": 133.85,
       "replacement_rate_training": 0.0,
-      "seconds": 16.16550922393799
+      "seconds": 16.058841705322266
     },
     "sarsa_original": {
       "last_return": -160.8,
@@ -544,7 +544,7 @@
       "first_success_episode": 1125,
       "first100_pushes": 133.72,
       "replacement_rate_training": 0.0,
-      "seconds": 15.124767065048218
+      "seconds": 14.995920181274414
     },
     "qlearning_modified": {
       "last_return": -173.02079999999975,
@@ -558,7 +558,7 @@
       "first_success_episode": 1595,
       "first100_pushes": 132.9,
       "replacement_rate_training": 0.19987911062143263,
-      "seconds": 17.450862884521484
+      "seconds": 17.33126401901245
     },
     "sarsa_modified": {
       "last_return": -121.08400000000009,
@@ -572,7 +572,7 @@
       "first_success_episode": 1213,
       "first100_pushes": 133.31,
       "replacement_rate_training": 0.1998969311889993,
-      "seconds": 16.528008937835693
+      "seconds": 16.35427498817444
     }
   },
   "checkpoints": {
@@ -2321,7 +2321,7 @@
         "mean_avg_max_q_last500": -67.78681554532322,
         "last500_success": 0.98,
         "last500_return": -156.038,
-        "seconds": 31.92258596420288
+        "seconds": 29.365862131118774
       },
       {
         "algo": "sarsa",
@@ -2349,7 +2349,7 @@
         "mean_avg_max_q_last500": -66.98099698981166,
         "last500_success": 0.99,
         "last500_return": -160.8,
-        "seconds": 31.74700093269348
+        "seconds": 29.366801023483276
       },
       {
         "algo": "qlearning",
@@ -2377,7 +2377,7 @@
         "mean_avg_max_q_last500": -75.3180495299639,
         "last500_success": 0.832,
         "last500_return": -173.02079999999975,
-        "seconds": 34.85131788253784
+        "seconds": 32.32909393310547
       },
       {
         "algo": "sarsa",
@@ -2405,7 +2405,7 @@
         "mean_avg_max_q_last500": -77.01773499337759,
         "last500_success": 1.0,
         "last500_return": -121.08400000000009,
-        "seconds": 36.286850690841675
+        "seconds": 32.953965187072754
       },
       {
         "algo": "qlearning",
@@ -2433,7 +2433,7 @@
         "mean_avg_max_q_last500": -66.37294541580607,
         "last500_success": 1.0,
         "last500_return": -131.714,
-        "seconds": 31.38267421722412
+        "seconds": 28.814250946044922
       },
       {
         "algo": "sarsa",
@@ -2461,7 +2461,7 @@
         "mean_avg_max_q_last500": -71.12521495700659,
         "last500_success": 0.946,
         "last500_return": -147.694,
-        "seconds": 32.993555784225464
+        "seconds": 30.218350172042847
       },
       {
         "algo": "qlearning",
@@ -2489,7 +2489,7 @@
         "mean_avg_max_q_last500": -76.14350676117631,
         "last500_success": 0.992,
         "last500_return": -143.5095999999999,
-        "seconds": 35.01627278327942
+        "seconds": 31.778877019882202
       },
       {
         "algo": "sarsa",
@@ -2517,7 +2517,7 @@
         "mean_avg_max_q_last500": -74.71609833431418,
         "last500_success": 0.93,
         "last500_return": -160.95239999999984,
-        "seconds": 35.846997022628784
+        "seconds": 32.25884485244751
       },
       {
         "algo": "qlearning",
@@ -2545,7 +2545,7 @@
         "mean_avg_max_q_last500": -67.05277462222101,
         "last500_success": 0.996,
         "last500_return": -134.868,
-        "seconds": 31.726818799972534
+        "seconds": 29.329205989837646
       },
       {
         "algo": "sarsa",
@@ -2573,7 +2573,7 @@
         "mean_avg_max_q_last500": -68.49750155499318,
         "last500_success": 0.998,
         "last500_return": -156.934,
-        "seconds": 32.36450219154358
+        "seconds": 29.943536043167114
       },
       {
         "algo": "qlearning",
@@ -2601,7 +2601,7 @@
         "mean_avg_max_q_last500": -73.20721523219545,
         "last500_success": 1.0,
         "last500_return": -135.37479999999994,
-        "seconds": 34.20927691459656
+        "seconds": 31.729960918426514
       },
       {
         "algo": "sarsa",
@@ -2629,7 +2629,7 @@
         "mean_avg_max_q_last500": -76.81867950441845,
         "last500_success": 0.86,
         "last500_return": -166.49679999999978,
-        "seconds": 35.63159990310669
+        "seconds": 32.7088303565979
       },
       {
         "algo": "qlearning",
@@ -2657,7 +2657,7 @@
         "mean_avg_max_q_last500": -67.48843576269384,
         "last500_success": 0.866,
         "last500_return": -157.812,
-        "seconds": 32.257795095443726
+        "seconds": 29.505648851394653
       },
       {
         "algo": "sarsa",
@@ -2685,7 +2685,7 @@
         "mean_avg_max_q_last500": -70.74502586473979,
         "last500_success": 0.988,
         "last500_return": -144.998,
-        "seconds": 33.56946110725403
+        "seconds": 30.447598695755005
       },
       {
         "algo": "qlearning",
@@ -2713,7 +2713,7 @@
         "mean_avg_max_q_last500": -77.27743505134025,
         "last500_success": 0.922,
         "last500_return": -162.9119999999998,
-        "seconds": 35.34834623336792
+        "seconds": 32.6876962184906
       },
       {
         "algo": "sarsa",
@@ -2741,7 +2741,7 @@
         "mean_avg_max_q_last500": -76.25117098741099,
         "last500_success": 0.972,
         "last500_return": -138.67159999999996,
-        "seconds": 35.69473195075989
+        "seconds": 32.34464907646179
       },
       {
         "algo": "qlearning",
@@ -2769,7 +2769,7 @@
         "mean_avg_max_q_last500": -68.02882181987013,
         "last500_success": 0.968,
         "last500_return": -144.666,
-        "seconds": 31.72716498374939
+        "seconds": 29.512662172317505
       },
       {
         "algo": "sarsa",
@@ -2797,7 +2797,7 @@
         "mean_avg_max_q_last500": -68.50864658100082,
         "last500_success": 0.906,
         "last500_return": -140.232,
-        "seconds": 32.0213828086853
+        "seconds": 29.5312979221344
       },
       {
         "algo": "qlearning",
@@ -2825,7 +2825,7 @@
         "mean_avg_max_q_last500": -75.21493715958347,
         "last500_success": 0.982,
         "last500_return": -145.2955999999999,
-        "seconds": 42.087671995162964
+        "seconds": 36.104671001434326
       },
       {
         "algo": "sarsa",
@@ -2853,7 +2853,7 @@
         "mean_avg_max_q_last500": -77.83658907352762,
         "last500_success": 0.996,
         "last500_return": -133.9648,
-        "seconds": 47.629607915878296
+        "seconds": 37.61097693443298
       }
     ]
   },

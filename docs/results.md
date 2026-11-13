@@ -1,6 +1,6 @@
 # Results (generated from results/results.json)
 
-Run: 2026-11-14T01:55:59 on `Shreyanshs-MacBook-Air.local` (Python 3.14.7, Gymnasium 1.4.0), total 278s.
+Run: 2026-11-14T02:09:30 on `Shreyanshs-MacBook-Air.local` (Python 3.14.7, Gymnasium 1.4.0), total 253s.
 
 ## (a) Wrapper verification
 
