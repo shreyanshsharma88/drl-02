@@ -74,17 +74,6 @@ def cells() -> List:
 Each member took part in every part of the work (design, implementation, experiments and write-up), and the work was shared equally. The 100% entries record that every member contributed fully; as shares of the total work, the split is one third each.
 """))
     C.append(md("""
-### How this report is organised
-| Section | Content | Marks |
-|---|---|---|
-| 0 | Setup: execution environment, configuration, helpers | n/a |
-| (a) | Sticky-actuator wrapper and its experimental verification | 2 |
-| (b) | Discretization, Q-learning agent, training on both environments | 3 |
-| (c) | SARSA agent (only the TD target differs), training on both environments | 3 |
-| (d) | Performance evaluation: 5 plot families, policy maps, greedy test table | 3 |
-| (e) | Discussion: 5 questions answered with our measurements | 2 |
-| (f) | Virtual-lab execution screenshots (with timestamps) | n/a |
-| App. A-C | Hyper-parameter pilot, CLI script, complete per-episode training logs (every iteration) | n/a |
 
 The solution is written from scratch in NumPy as a small package, `drl_sticky`, which holds the wrapper, discretizer, agents, training loop, evaluation and plots. Each module appears in full below as a `%%writefile` cell, so running the notebook from top to bottom writes the package, runs every experiment and regenerates every number and figure in this PDF. Gymnasium provides only the MountainCar-v0 physics, and we use no RL library.
 
