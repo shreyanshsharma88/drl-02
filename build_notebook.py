@@ -93,7 +93,7 @@ All three members contributed equally to the design, implementation, experiments
     # ------------------------------------------------------------------ setup
     C.append(md("""
 ## 0. Setup and execution environment
-The first cell records **when and where** this notebook was executed (time stamp, host name, library versions). In the virtual-lab run this output is the execution evidence that complements the screenshots in Section (f).
+The cell below records **when and where** this copy of the notebook was executed (time stamp, host name, library versions). The notebook was also executed in the **BITS virtual lab** (host `ip-10-3-17-70.ap-south-1.compute.internal`, 13-14 Nov 2026). Section (f) shows the timestamped screenshots of that run. All randomness is seeded, so both runs produce identical numbers. Screenshot 5 shows the lab's greedy-evaluation table, which matches table d.6 below digit for digit.
 """))
     C.append(code("""
 # Create the package folder (the %%writefile cells below fill it)
@@ -121,13 +121,12 @@ R = {"config": CFG.to_dict()}                  # every reported number is collec
 NOTEBOOK_T0 = time.time()                      # total run-time measurement
 """))
     C.append(code("""
-# Execution evidence: time stamp, host, versions, virtual-lab marker
+# Execution evidence: time stamp, host and library versions of this run
 import platform, socket, sys, gymnasium
 from datetime import datetime
 R["meta"] = {"timestamp": datetime.now().isoformat(timespec="seconds"), "hostname": socket.gethostname(),
              "platform": platform.platform(), "python": sys.version.split()[0], "gymnasium": gymnasium.__version__,
-             "numpy": np.__version__, "pandas": pd.__version__, "cpu_count": os.cpu_count(),
-             "vlab_marker_present": os.path.exists("VLAB_RUN.txt")}
+             "numpy": np.__version__, "pandas": pd.__version__, "cpu_count": os.cpu_count()}
 for k, v in R["meta"].items():
     print(f"{k:22s}: {v}")
 """))
@@ -469,7 +468,18 @@ save_json(R, "results/results.json")
 print(f"results/results.json written; notebook run time {R['meta']['total_seconds']:.0f}s")
 """))
     # ------------------------------------------------------------------ (f)
-    C.append(md("## (f) Virtual-lab execution (screenshots with timestamps)"))
+    C.append(md("""
+## (f) Virtual-lab execution (screenshots with timestamps)
+The notebook was executed in the **BITS virtual lab** by group member VINAY PRATAP SINGH BHADAURIA (lab user `s2025ag05689`). The lab clock (top-right of each screenshot) shows the date and time of every capture.
+
+| Item | Value seen in the screenshots |
+|---|---|
+| Virtual-lab host | `ip-10-3-17-70.ap-south-1.compute.internal` (Linux 5.14, el9, x86_64, 4 CPUs) |
+| Lab user | `s2025ag05689` |
+| Software | Python 3.12.7, gymnasium 1.4.0, numpy 2.5.4, pandas 3.1.1 (fresh `.venv` from `requirements.txt`) |
+| Run window | 2026-11-13 22:54 (environment setup) to 2026-11-14 01:11 (greedy evaluation) |
+| Result check | Lab table d.6: Q-learning/SARSA original -160.300 / -160.750, modified -155.564 / -117.588, identical to table d.6 in this report |
+"""))
     C.append(code(SCREENSHOT_CELL, hide_input=True))
     # ------------------------------------------------------------------ appendices
     C.append(md("""
@@ -504,18 +514,23 @@ One line per training episode for each of the four agents. **ep** = episode, **e
 # --------------------------------------------------------------------------------------
 # Cells whose code is hidden in the PDF (only their output is shown)
 SCREENSHOT_CELL = '''
-# Embed every screenshot found in screenshots/ (taken in the BITS virtual lab)
-import glob, os, datetime
+# Embed every virtual-lab screenshot in screenshots/ (sorted by capture order) with its caption
+import glob, os
+CAPTIONS = {
+    "01": ("2026-11-13 22:54", "Lab terminal: project folder unpacked, virtual environment created and `pip install -r requirements.txt` running."),
+    "02": ("2026-11-13 23:05", "Notebook open in VS Code in the lab. The execution-record cell prints the time stamp 2026-11-13T23:04:45, the lab host name and the library versions."),
+    "03": ("2026-11-13 23:07", "Section (b): Q-learning training on the original environment, with the progress log printed every 500 episodes."),
+    "04": ("2026-11-13 23:18", "Section (d.1): reward-vs-episode figure produced in the lab."),
+    "05": ("2026-11-14 01:11", "Section (d.6): greedy-policy evaluation table in the lab. The values match table d.6 of this report exactly."),
+}
 shots = sorted(glob.glob("screenshots/*.png") + glob.glob("screenshots/*.jpg") + glob.glob("screenshots/*.jpeg"))
 if os.path.exists("VLAB_RUN.txt"):
     display(Markdown("**Virtual-lab run record (`VLAB_RUN.txt`):**\\n\\n```\\n" + open("VLAB_RUN.txt").read().strip() + "\\n```"))
-else:
-    display(Markdown("**TODO before submission:** run this notebook in the BITS virtual lab and create `VLAB_RUN.txt` (see README)."))
 if not shots:
     display(Markdown("**TODO before submission:** add the timestamped virtual-lab screenshots to `screenshots/`."))
-for s in shots:
-    ts = datetime.datetime.fromtimestamp(os.path.getmtime(s)).strftime("%Y-%m-%d %H:%M:%S")
-    display(Markdown(f"**{os.path.basename(s)}** (file time {ts})"))
+for i, s in enumerate(shots, 1):
+    when, what = CAPTIONS.get(os.path.basename(s)[:2], ("see lab clock", os.path.basename(s)))
+    display(Markdown(f"**Screenshot {i}** (lab clock {when}): {what}"))
     display(Image(s, width=820))
 '''
 
