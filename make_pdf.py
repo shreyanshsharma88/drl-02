@@ -50,6 +50,7 @@ pre, code, .jp-RenderedText pre, .highlight pre, .CodeMirror pre {
 .jp-OutputArea-output, .jp-OutputArea-child { overflow: visible !important; max-width: 100% !important; }
 .jp-RenderedImage img, .jp-OutputArea-output img { max-width: 100% !important; break-inside: avoid; }
 .dense-log pre { font-size: 5.9pt !important; line-height: 1.18 !important; }
+.dense-log table { font-size: 6.5pt !important; } .dense-log td, .dense-log th { padding: 1px 4px !important; }
 .jp-OutputArea-output pre { font-size: 7.4pt !important; }
 </style>
 """

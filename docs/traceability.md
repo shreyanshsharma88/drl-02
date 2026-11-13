@@ -33,5 +33,5 @@ Report = `Group 84 - Q_learning_SARSA_Set A.pdf` (exported from `Group84_Q_learn
 | 27 | (e) five discussion questions | `report_text.py` (e1-e5) | (e) | n/a |
 | 28 | Comments on every function/operation | docstrings + inline comments | all code | `test_every_function_and_class_documented` |
 | 29 | Contribution declaration at the beginning | notebook first cell, `CONTRIBUTION.md` | page 1 | `test_contribution_declaration_lists_all_members`, `test_pdf_first_page` |
-| 30 | One PDF with all code + outputs of every iteration | `make_pdf.py`, Appendix C | whole PDF | `test_pdf_name_constant`, `test_pdf_contains_every_module` |
+| 30 | One PDF with all code + outputs of every iteration | `make_pdf.py`, training cells (b)-(c), Appendix C (every episode, 100-episode blocks) + `results/logs/*.csv` | whole PDF | `test_pdf_name_constant`, `test_pdf_contains_every_module` |
 | 31 | Virtual-lab execution, timestamped screenshots | `screenshots/`, `VLAB_RUN.txt`, env-info cell | 0, (f) | manual (see user guide) |

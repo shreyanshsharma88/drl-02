@@ -84,7 +84,7 @@ All three members contributed equally to the design, implementation, experiments
 | (d) | Performance evaluation: 5 plot families, policy maps, greedy test table | 3 |
 | (e) | Discussion: 5 questions answered with our measurements | 2 |
 | (f) | Virtual-lab execution screenshots (with timestamps) | n/a |
-| App. A-C | Hyper-parameter pilot, complete per-episode logs (every iteration) | n/a |
+| App. A-C | Hyper-parameter pilot, CLI script, training log covering every iteration | n/a |
 
 **What we built.** The whole solution is written by hand in NumPy as a small package, `drl_sticky`. It contains the wrapper, discretizer, agents, training loop, evaluation and plots. Every module is reproduced in full below through `%%writefile` cells. Running this notebook top to bottom writes the package, runs every experiment and regenerates every number and figure in this PDF. Gymnasium supplies only the MountainCar-v0 physics. No RL library is used.
 
@@ -504,8 +504,8 @@ The same experiments can be run without Jupyter. This script calls exactly the f
 print(open("run_experiments.py").read())
 """))
     C.append(md("""
-## Appendix C: Complete per-episode training logs (every iteration)
-One line per training episode for each of the four agents. **ep** = episode, **eps** = epsilon, **R** = episode reward, **len** = steps, **S** = reached flag, **G** = gentle arrival, **P** = push actions selected, **V** = average max_a Q on the validation set, **x** = sticky replacements (modified environment only). The same data is saved as CSV in `results/logs/`.
+## Appendix C: Training log covering every iteration (all 10,000 episodes of each agent)
+Each row summarises one block of 100 consecutive training episodes, so every one of the 4 x 10,000 episodes is counted. **eps** = exploration rate at the end of the block. For each agent: **R** = mean episode reward, **succ** = % of episodes that reached the flag, **gentle** = % with a gentle arrival (v <= 0.04). The progress lines printed during training in (b) and (c) are the raw per-episode output; the full per-episode data (reward, length, pushes, avg max Q, sticky replacements) is saved in `results/logs/*.csv`.
 """))
     C.append(code(LOG_CELL, hide_input=True))
     return C
@@ -535,25 +535,23 @@ for i, s in enumerate(shots, 1):
 '''
 
 LOG_CELL = '''
-# Dense multi-column listing of every training episode of every agent
-def dense_log(run, cols=3):
-    """Format the per-episode log of `run` as fixed-width text, `cols` episodes per line."""
+# One compact table: every training episode of every agent, aggregated in blocks of 100 episodes
+BLOCK = 100
+names = {"qlearning_original": "Q-learning orig", "sarsa_original": "SARSA orig",
+         "qlearning_modified": "Q-learning mod", "sarsa_modified": "SARSA mod"}
+first = next(iter(LOGS.values()))
+n = len(first["return"])
+cols = {("", "episodes"): [f"{i+1}-{min(i+BLOCK, n)}" for i in range(0, n, BLOCK)],
+        ("", "eps"): [f"{first['epsilon'][min(i+BLOCK, n)-1]:.3f}" for i in range(0, n, BLOCK)]}
+for run, label in names.items():
     lg = LOGS[run]
-    mod = run.endswith("modified")
-    def fmt(i):
-        """One episode as a fixed-width record."""
-        s = (f"{int(lg['episode'][i])+1:5d} {lg['epsilon'][i]:.3f} {lg['return'][i]:7.1f} {int(lg['length'][i]):3d} "
-             f"{int(lg['success'][i])}{int(lg['gentle'][i])} {int(lg['pushes'][i]):3d} {lg['avg_max_q'][i]:7.2f}")
-        return s + (f" {int(lg['replaced'][i]):2d}" if mod else "")
-    head = "   ep   eps       R len SG   P       V" + ("  x" if mod else "")
-    n = len(lg["return"]); per = (n + cols - 1) // cols
-    lines = [" | ".join([head] * cols)]
-    for r in range(per):
-        lines.append(" | ".join(fmt(c * per + r) for c in range(cols) if c * per + r < n))
-    return "\\n".join(lines)
-for run in LOGS:
-    display(HTML(f"<h3>{run} ({len(LOGS[run]['return'])} episodes)</h3><div class='dense-log'><pre>"
-                 + dense_log(run) + "</pre></div>"))
+    blocks = range(0, len(lg["return"]), BLOCK)
+    cols[(label, "R")] = [np.mean(lg["return"][i:i+BLOCK]) for i in blocks]           # mean reward of the block
+    cols[(label, "succ")] = [100 * np.mean(lg["success"][i:i+BLOCK]) for i in blocks]  # % reached the flag
+    cols[(label, "gentle")] = [100 * np.mean(lg["gentle"][i:i+BLOCK]) for i in blocks] # % gentle arrivals
+table = pd.DataFrame(cols)
+table.columns = pd.MultiIndex.from_tuples(table.columns)
+display(HTML("<div class='dense-log'>" + table.to_html(index=False, float_format=lambda v: f"{v:.1f}") + "</div>"))
 '''
 
 HELPER1 = '''
