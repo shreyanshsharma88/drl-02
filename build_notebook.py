@@ -71,7 +71,7 @@ def cells() -> List:
 | 2 | LAKSHYA KANCHAN | 2025AG05062 | 2025ag05062@wilp.bits-pilani.ac.in | **100%** |
 | 3 | VINAY PRATAP SINGH BHADAURIA | 2025AG05689 | 2025ag05689@wilp.bits-pilani.ac.in | **100%** |
 
-All three members contributed equally to the design, implementation, experiments and the write-up.
+Each member took part in every part of the work (design, implementation, experiments and write-up), and the work was shared equally. The 100% entries record that every member contributed fully; as shares of the total work, the split is one third each.
 """))
     C.append(md("""
 ### How this report is organised
@@ -86,7 +86,7 @@ All three members contributed equally to the design, implementation, experiments
 | (f) | Virtual-lab execution screenshots (with timestamps) | n/a |
 | App. A-C | Hyper-parameter pilot, CLI script, complete per-episode training logs (every iteration) | n/a |
 
-We wrote the whole solution by hand in NumPy as a small package, `drl_sticky`, which holds the wrapper, discretizer, agents, training loop, evaluation and plots. Each module appears in full below as a `%%writefile` cell, so running the notebook from top to bottom writes the package, runs every experiment and regenerates every number and figure in this PDF. Gymnasium provides only the MountainCar-v0 physics, and we use no RL library.
+The solution is written from scratch in NumPy as a small package, `drl_sticky`, which holds the wrapper, discretizer, agents, training loop, evaluation and plots. Each module appears in full below as a `%%writefile` cell, so running the notebook from top to bottom writes the package, runs every experiment and regenerates every number and figure in this PDF. Gymnasium provides only the MountainCar-v0 physics, and we use no RL library.
 
 For reproducibility we use one master seed, 84 (our group number), and derive separate RNG streams from it for environment resets, the sticky actuator and the agent's exploration. Because the streams are separate, actuator noise never shifts the agent's exploration draws. All four agents share the same `Config` object.
 """))

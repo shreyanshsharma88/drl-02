@@ -46,7 +46,7 @@ def evaluate_greedy(
         rets.append(ret)
         lens.append(n)
         succ.append(float(term))
-        gentle.append(float(term and obs[1] <= cfg.gentle_speed))
+        gentle.append(float(term and not trunc and obs[0] >= 0.5 and obs[1] <= cfg.gentle_speed))
         pushes.append(p)
         vel.append(float(obs[1]) if term else np.nan)
     env.close()

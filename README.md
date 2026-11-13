@@ -1,6 +1,6 @@
 # Group 84: Robust RL under Sticky Actuators (DRL Assignment II, Set A)
 
-Tabular **Q-learning vs SARSA** on a modified **MountainCar-v0**. The modification is a sticky actuator: with probability 0.20 an attempted action change is ignored. The reward adds an energy penalty and a gentle-arrival bonus. Everything is written by hand in NumPy. Gymnasium supplies only the base physics.
+Tabular **Q-learning vs SARSA** on a modified **MountainCar-v0**. The modification is a sticky actuator: with probability 0.20 an attempted action change is ignored. The reward adds an energy penalty and a gentle-arrival bonus. Everything is written from scratch in NumPy (no RL library). Gymnasium supplies only the base physics.
 
 **Submission file:** `Group 84 - Q_learning_SARSA_Set A.pdf` (all code + all outputs, built from `Group84_Q_learning_SARSA_SetA.ipynb`).
 
@@ -16,6 +16,15 @@ Tabular **Q-learning vs SARSA** on a modified **MountainCar-v0**. The modificati
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 ```
+
+On Windows, create the environment with `python -m venv .venv` and activate it with
+`.venv\Scripts\Activate.ps1` before installing the requirements.
+
+PDF export uses ReportLab and Beautiful Soup, included in the requirements, with
+fonts bundled by Matplotlib. It needs no Chrome/Chromium, LaTeX, browser downloads,
+or system HTML-rendering libraries. Install the Python requirements in the lab
+environment before running the commands below. The PDF uses a paginated report
+layout rather than reproducing the HTML stylesheet exactly.
 
 ## Run
 ```bash

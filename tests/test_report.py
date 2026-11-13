@@ -13,6 +13,38 @@ PDF = ROOT / "Group 84 - Q_learning_SARSA_Set A.pdf"
 need_results = pytest.mark.skipif(not RES.exists(), reason="run the notebook / run_experiments.py first")
 
 
+def test_pdf_export_without_browser(tmp_path, monkeypatch):
+    """Export tables, embedded plots and long logs without external executables."""
+    import base64
+    import io
+    from PIL import Image
+    from pypdf import PdfReader
+    from make_pdf import html_to_pdf
+
+    monkeypatch.setenv("PATH", "")
+    image = io.BytesIO()
+    Image.new("RGB", (40, 20), "red").save(image, format="PNG")
+    encoded = base64.b64encode(image.getvalue()).decode("ascii")
+    records = "\n".join(f"episode {episode:04d} reward -100" for episode in range(600))
+    source = tmp_path / "report.html"
+    target = tmp_path / "report.pdf"
+    source.write_text(
+        '<html><body><h1>Export check</h1><p>Reward <strong>summary</strong>.</p>'
+        '<table><tr><th>Agent</th><th>Reward</th></tr>'
+        '<tr><td>SARSA</td><td>-100</td></tr></table>'
+        f'<img src="data:image/png;base64,{encoded}"><pre>{records}</pre>'
+        '<p>End of report</p></body></html>', encoding="utf-8",
+    )
+    assert html_to_pdf(str(source), str(target))
+    monkeypatch.undo()   # restore PATH before reading back (pypdf 7 checks PATH-dependent defaults)
+    reader = PdfReader(target)
+    text = "\n".join(page.extract_text() for page in reader.pages)
+    for expected in ["Export check", "SARSA", "episode 0000", "episode 0599", "End of report"]:
+        assert expected in text
+    assert len(reader.pages) > 1
+    assert any(list(page.images) for page in reader.pages)
+
+
 @need_results
 def test_results_consistent_with_saved_qtables():
     """Re-evaluating the saved Q-tables reproduces the greedy-test table in results.json."""
